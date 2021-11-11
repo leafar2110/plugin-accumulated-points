@@ -51,64 +51,62 @@ include (AP_POINTS_URL.'/inc/options.php');
 include (AP_POINTS_URL.'/inc/post-type.php');
 include (AP_POINTS_URL.'/inc/enqueue.php');
 
-// acumular puntos por compras 
+// acumular puntos por categoria 
 
 add_action( 'woocommerce_thankyou', function($order_id){
-
   global $wpdb;
   global $woocommerce;
-  $order = new WC_Order($order_id);
-  $id = $order->get_user_id();
-
-  $table_user = $wpdb->prefix."users";
-  $query = "SELECT * FROM {$wpdb->prefix}users  WHERE `ID`=$id";
-  $list_user = $wpdb->get_results($query,ARRAY_A);
-  if(empty($list_user[0]['user_points'])){
-    $points_accum = 0;
-  }else{
-    $points_accum = $list_user[0]['user_points'];
-  }
   $query_conf = "SELECT * FROM {$wpdb->prefix}ap_points_configuration";
   $list_conf = $wpdb->get_results($query_conf,ARRAY_A);
-  if(empty($list_conf)){
-    $list_conf = array();
-  }
-  $points_conf = number_format($list_conf[0]['points']);
-  $euros_conf = number_format($list_conf[0]['euros']);
-  $cat_conf = json_decode($list_conf[0]['category']);
-  $accumulated_point = 0;
+  
+  if(!empty($list_conf)){
+    
+    $order = new WC_Order($order_id);
+    $id = $order->get_user_id();
 
-  if ( $order->get_status() != 'failed' ) {
-    foreach ($order->get_items() as $item_key => $item ):
-      $point_field = get_post_meta($item->get_product_id(), '_ap_custom_product_points_field', true);
-      $euro_field =  get_post_meta($item->get_product_id(), '_ap_custom_product_euro_field', true);
-
-      if( has_term($cat_conf, 'product_cat', $item->get_product_id()) and !$point_field) {
-        // Get an instance of the WC_Product Object
-        $_product = $item->get_product();
-        $price_product = $_product->get_price();
-        $quantity_product = $item->get_quantity();
-        $amount = $price_product * $quantity_product;
-        $points = ($amount / $euros_conf) * $points_conf;
-        $accumulated_point = $accumulated_point + $points;
-        
-      }elseif($point_field){
-        // Get an instance of the WC_Product Object
-        $_product = $item->get_product();
-        $price_product = $_product->get_price();
-        $quantity_product = $item->get_quantity();
-        $amount = $price_product * $quantity_product;
-        $points = ($amount / $euro_field) * $point_field;
-        $accumulated_point = $accumulated_point + $points;
-      }
-
-    endforeach;
-
-    if($accumulated_point > 0){
-      $total_point = $accumulated_point + $points_accum;
-      $wpdb->update($table_user, array('ID'=>$id, 'user_points'=>$total_point), array('ID'=>$id));
+    $table_user = $wpdb->prefix."users";
+    $query = "SELECT * FROM {$wpdb->prefix}users  WHERE `ID`=$id";
+    $list_user = $wpdb->get_results($query,ARRAY_A);
+    if(empty($list_user[0]['user_points'])){
+      $points_accum = 0;
+    }else{
+      $points_accum = $list_user[0]['user_points'];
     }
     
+    $points_conf = number_format($list_conf[0]['points']);
+    $euros_conf = number_format($list_conf[0]['euros']);
+    $cat_conf = json_decode($list_conf[0]['category']);
+    $accumulated_point = 0;
+
+    if ( $order->get_status() != 'failed' ) {
+      foreach ($order->get_items() as $item_key => $item ):
+        $point_field = get_post_meta($item->get_product_id(), '_ap_custom_product_points_field', true);
+        $euro_field =  get_post_meta($item->get_product_id(), '_ap_custom_product_euro_field', true);
+        $_product = $item->get_product();
+        $price_product = $_product->get_price();
+        $quantity_product = $item->get_quantity();
+
+        if( has_term($cat_conf, 'product_cat', $item->get_product_id()) and !$point_field) {
+
+          $amount = $price_product * $quantity_product;
+          $points = ($amount / $euros_conf) * $points_conf;
+          $accumulated_point = $accumulated_point + $points;
+          
+        }elseif($point_field){
+
+          $amount = $price_product * $quantity_product;
+          $points = ($amount / $euro_field) * $point_field;
+          $accumulated_point = $accumulated_point + $points;
+        }
+
+      endforeach;
+
+      if($accumulated_point > 0){
+        $total_point = $accumulated_point + $points_accum;
+        $wpdb->update($table_user, array('ID'=>$id, 'user_points'=>$total_point), array('ID'=>$id));
+      }
+      
+    }
   }
 });
 
