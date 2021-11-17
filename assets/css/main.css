@@ -46,3 +46,120 @@
 	background-color: #fff;
 	box-shadow: 0 5px 4px -2px rgba(0, 0, 0, 0.15);
 }
+
+/**
+ * Checkbox Toggle UI
+ */
+ input[type="checkbox"].wppd-ui-toggle {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    -webkit-tap-highlight-color: transparent;
+
+    width: auto;
+    height: auto;
+    vertical-align: middle;
+    position: relative;
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    margin: 0 4px;
+    background: none;
+    box-shadow: none;
+}
+input[type="checkbox"].wppd-ui-toggle:focus {
+    box-shadow: none;
+}
+input[type="checkbox"].wppd-ui-toggle:after {
+    content: '';
+    font-size: 8px;
+    font-weight: 400;
+    line-height: 18px;
+    text-indent: -14px;
+    color: #ffffff;
+    width: 36px;
+    height: 18px;
+    display: inline-block;
+    background-color: #a7aaad;
+    border-radius: 72px;
+    box-shadow: 0 0 12px rgb(0 0 0 / 15%) inset;
+}
+input[type="checkbox"].wppd-ui-toggle:before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    display: block;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    margin: 0;
+    border-radius: 50%;
+    background-color: #ffffff;
+}
+input[type="checkbox"].wppd-ui-toggle:checked:before {
+    left: 20px;
+    margin: 0;
+    background-color: #ffffff;
+}
+input[type="checkbox"].wppd-ui-toggle,
+input[type="checkbox"].wppd-ui-toggle:before,
+input[type="checkbox"].wppd-ui-toggle:after,
+input[type="checkbox"].wppd-ui-toggle:checked:before,
+input[type="checkbox"].wppd-ui-toggle:checked:after {
+    transition: ease .15s;
+}
+input[type="checkbox"].wppd-ui-toggle:checked:after {
+    content: 'ON';
+    background-color: #2271b1;
+}
+
+.action-btn-ap{
+	display: flex;
+    
+}
+.submitdelete_ap{
+	color: #b32d2e;
+	background: transparent;
+	border: none;
+}
+
+.btn-primary_ap{
+	margin-left: 4px;
+	padding: 4px 8px;
+	text-decoration: none;
+	border: 1px solid #2271b1;
+	border-radius: 2px;
+		text-shadow: none;
+		font-weight: 600;
+		font-size: 13px;
+		line-height: normal;
+		color: #2271b1;
+		background: #f6f7f7;
+		cursor: pointer
+}
+
+.btn_history{
+	background: transparent;
+    border: none;
+    color: #2874b5;
+    padding: 0;
+	cursor: pointer;
+}
+.name_user_ap{
+	font-size: 14px !important;
+}
+.btn_email_ap{
+	background: transparent;
+    border: none;
+    color: #2874b5;
+    padding: 0;
+}
+
+.show-form_edit_puntos{
+	display: block !important;
+}
+
+.config_ap input, .config_ap select{
+	width: 100%;
+}

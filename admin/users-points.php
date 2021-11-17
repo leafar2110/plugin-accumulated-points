@@ -1,34 +1,54 @@
 <?php 
 global $wpdb;
 
-$tabla = "{$wpdb->prefix}users";
+$tabla = "{$wpdb->prefix}ap_points_history";
+$tabla_user = "{$wpdb->prefix}users";
+
+
+
 
 // Actualizar puntos
-if(isset($_POST['btnactualizar'])){
+if(isset($_POST['btn_sumar'])){
+    
     $id = stripslashes_deep($_POST['id']); 
     $points = stripslashes_deep($_POST['points']);
-
-    $wpdb->update($tabla, array('ID'=>$id, 'user_points'=>$points), array('ID'=>$id));
+    $points_acount = stripslashes_deep($_POST['point_history']);
+    $total_points = $points_acount + $points;
+    $datos = [
+        'IdHistory' => null,
+        'ID' => $id,
+        'point_history' => $total_points,
+        'action_history' => '+'.$points,
+        'registered_history' => date("Y:m:d H:i:s"),
+    ];
+    $respuesta =  $wpdb->insert($tabla,$datos);
 }
-$query = "SELECT * FROM {$wpdb->prefix}users";
+if(isset($_POST['btn_restar'])){
+    $id = stripslashes_deep($_POST['id']); 
+    $points = stripslashes_deep($_POST['points']);
+    $points_acount = stripslashes_deep($_POST['point_history']);
+    $total_points = $points_acount - $points;
+    $datos = [
+        'IdHistory' => null,
+        'ID' => $id,
+        'point_history' => $total_points,
+        'action_history' => '-'.$points,
+        'registered_history' => date("Y:m:d H:i:s"),
+    ];
+    $respuesta =  $wpdb->insert($tabla,$datos);
+}
+
+
+$query = "SELECT $tabla_user.ID, $tabla_user.display_name, $tabla_user.user_email  FROM $tabla_user";
 $list_user = $wpdb->get_results($query,ARRAY_A);
-if(empty($list_user)){
-	$list_user = array();
-}
 
-$path = 'admin.php?page=accumulated-points/admin/settings-points.php';
-$cpt = 'edit.php?post_type=ap_regalo';
+
+
+
 ?>
 
 <div class="wrap">
-<?php echo "<h1 class='wp-heading-inline'>".get_admin_page_title()."</h1>"; ?>
-	<?php settings_errors(); ?>
-
-	<ul class="nav nav-tabs">
-    <li ><a href="<?php echo admin_url($cpt); ?>">Regalos</a></li>
-    <li ><a href="<?php echo admin_url($path); ?>">Ajustes</a></li>
-	<li class="active" ><a href="#>">Usuarios y puntos</a></li>	
-	</ul>
+<?php include(AP_POINTS_URL.'admin/partials/nav.php');?>
 
 	<div class="tab-content">
         <div id="tab-1" class="tab-pane active">
@@ -41,25 +61,67 @@ $cpt = 'edit.php?post_type=ap_regalo';
                 </thead>
                 <tbody id="the-list">
                         <?php foreach ($list_user as $key => $value):?>
+                           <?php $id_user = $value['ID'] ?>
+                            <?php 
+                            $query = "SELECT $tabla.point_history FROM $tabla WHERE ID = $id_user ORDER BY $tabla.registered_history DESC LIMIT 1" ;
+                            $list_history = $wpdb->get_results($query,ARRAY_A);
+                            ?>
+                            
+<?php if($list_history):?>
                         <tr>
-                            <td><?php echo $value['display_name']; ?></td>
-                            <td><?php echo $value['user_points']; ?>
-                                <div>
+                            <td><strong class="name_user_ap"><?php echo $value['display_name']; ?></strong><br>
+                            <a href="mailto:<?php echo $value['user_email']; ?>" class="btn_email_ap"><?php echo $value['user_email']; ?></a>
+
+                           
+                        </td>
+                            <td><?php echo $list_history[0]['point_history']; ?> <button class="btn_history" id="edit_puntos">Editar Puntos</button>  
+                                <div id="form_edit_puntos" style="display: none;">
                                     <form id="ap_form" action="" method="post">
                                         <input type="hidden" name="id" value="<?php echo $value['ID']; ?>">
-                                         <input type="number" name="points" value="<?php echo $value['user_points']; ?>">
-                                         <button type="submit" class="page-title-action" name="btnactualizar" id="btnguardar">Actualizar</button>
+                                        <input type="hidden" name="point_history" value="<?php echo $list_history[0]['point_history']; ?>">
+                                         <input type="number" name="points" value="">
+                                         <button type="submit" class="btn-primary_ap" name="btn_sumar" id="btnsumar">Sumar</button>
+                                         <button type="submit" class="btn-primary_ap" name="btn_restar" id="btnrestar">Restar</button>
                                     </form>
                                     
                                 </div>
                             </td>
                             <td>
-                                <button class="page-title-action">Editar Puntos</button>
+                                <div class="action-btn-ap">
+                                <div>
+                                <form action="<?php echo admin_url($path_users_history); ?>" method="post">
+                                <input type="hidden" name="id" value="<?php echo $value['ID']; ?>">
+                                <button class="btn-primary_ap " name="history_points" id="history_points">Historial</button>
+                            </form>
+                            
+                            </div>
+                              
+                                <div>
+                                <form id="ap_form" action="" method="post">
+                                        <input type="hidden" name="id" value="<?php echo $value['ID']; ?>">
+                                        <input type="hidden" name="point_history" value="<?php echo $list_history[0]['point_history']; ?>">
+                                         <input type="hidden" name="points" value="<?php echo $list_history[0]['point_history']; ?>">
+                                         <button type="submit" class="page-title-action submitdelete_ap" name="btn_restar" id="btnrestar">Reiniciar puntos</button>
+                                    </form>
+                                </div>
+                                </div>
+                           
+                              
+                            
                             </td>
                         </tr>
-                        <?php endforeach ?>
+                        <?php endif; endforeach ?>
                 </tbody>
             </table>
 		</div>
 	</div>
 </div>
+
+<script>
+    document.getElementById("edit_puntos").onclick = function() {editPuntos()};
+
+
+function editPuntos() {
+  document.getElementById("form_edit_puntos").classList.toggle("show-form_edit_puntos");
+}
+</script>
