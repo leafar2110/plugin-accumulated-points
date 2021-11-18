@@ -163,3 +163,6 @@ input[type="checkbox"].wppd-ui-toggle:checked:after {
 .config_ap input, .config_ap select{
 	width: 100%;
 }
+.edit_ap{
+    color: #2271b1 !important;
+}

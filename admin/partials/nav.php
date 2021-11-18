@@ -9,7 +9,7 @@
 
 <?php echo "<h1 class='wp-heading-inline'>".get_admin_page_title()."</h1>"; ?>
 	<?php settings_errors(); ?>
-
+<div>
 	<ul class="nav nav-tabs">
     <li ><a href="<?php echo admin_url($path_campaign); ?>">Campaña</a></li>
     <li ><a href="<?php echo admin_url($path_settings); ?>">Ajustes</a></li>

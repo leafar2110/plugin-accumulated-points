@@ -62,16 +62,7 @@ if(isset($_POST['btn_borrar'])){
     $wpdb->delete( $tabla_campaign, array( 'IdCampaign' => $id ) );
 }
 //actualizar configuracion
-if(isset($_POST['status_enviar'])){
-    $id = $_POST['IdConfig'];
-    $status = $_POST['status_check'];
-    var_dump($status);
-    $wpdb->update($tabla_campaign, 
-                  array( 
-                        'IdCampaign'=>$id,
-                        'status' => $status,),         
-                   array('IdCampaign'=>$id));
-}
+
 
 $query_conf = "SELECT * FROM $tabla_campaign";
 $list_conf = $wpdb->get_results($query_conf,ARRAY_A);
@@ -103,7 +94,7 @@ if(empty($list_conf) or isset($_POST['btn_editar'])){
                                         <label for="campaign">Nombres de campaña</label>
                                         </td>
                                         <td>  
-                                        <input type="text" value="<?php // echo $list_conf[0]['title_campaign']; ?>" name="name_campaign" placeholder="Campaña">
+                                        <input type="text" value="<?php if(!empty($list_conf)) echo $list_conf[0]['title_campaign']; ?>" name="name_campaign" placeholder="Campaña" require>
                                         </td>
                                         <td>
                                         </td>
@@ -119,10 +110,10 @@ if(empty($list_conf) or isset($_POST['btn_editar'])){
                                         <select id="rudr_select2_tags" name="rudr_select2_tags[]" multiple="multiple" style="width:99%;max-width:25em;">'
                                         <?php   $product_terms = get_terms( 'product_cat' );
                                         
-                                            foreach($product_terms as $product_term):?>
-                                            <?php var_dump($product_term);?>
+                                            foreach($product_terms as $product_term):
+                                                $product_exist = in_array($product_term->name, json_decode($list_conf[0]['category_campaign']), $strict = false);?>
                                             
-                                            <option  type="checkbox" id="<?php $product_term->term_id;?>"  value="<?php echo $product_term->name; ?>"><?php echo $product_term->name; ?></option>
+                                            <option  type="checkbox" id="<?php $product_term->term_id;?>" <?php if($product_exist ){ echo 'selected';};?>  value="<?php echo $product_term->name; ?>"><?php echo $product_term->name; ?></option>
                                             
                                         
                                         <?php endforeach; ?>
@@ -143,7 +134,17 @@ if(empty($list_conf) or isset($_POST['btn_editar'])){
                                         
                                     <div class="form-group">
                         
-                                        <select id="rudr_select2_posts" class="search-autocomplete" name="rudr_select2_posts[]" multiple="multiple" style="width:99%;max-width:25em;"></select>
+                                        <select id="rudr_select2_posts" class="search-autocomplete" name="rudr_select2_posts[]" multiple="multiple" style="width:99%;max-width:25em;">
+                                        <?php  $products_ids = json_decode($list_conf[0]['product_campaign']);
+                                        
+                                            foreach($products_ids as $product_id):
+                                            ?>
+                                            <option  type="checkbox" id="<?php $product_term->term_id;?>" selected  value="<?php echo $product_id; ?>"><?php echo get_the_title( $product_id ); ?></option>
+                                            
+                                        
+                                        <?php endforeach; ?>
+                                     
+                                    </select>
                                     </div>
                                                 
                                         </td>
@@ -191,7 +192,7 @@ if(empty($list_conf) or isset($_POST['btn_editar'])){
                             <button type="submit" class="page-title-action btn-primary_ap" name="btnguardar" id="btnguardar">Guardar</button>
                             <?php else: ?>
                             <input type="hidden" name="IdConfig" value="<?php echo $list_conf[0]['IdCampaign']; ?>">
-                            <button type="submit" class="page-title-action btn-primary_ap" name="btnactualizarconf" id="btnactualizarconf">actualizar</button>
+                            <button type="submit" class="page-title-action btn-primary_ap" name="btnactualizarconf" id="btnactualizarconf">Actualizar</button>
                             <?php endif; ?>
                                         </td>
                                     
@@ -208,7 +209,13 @@ if(empty($list_conf) or isset($_POST['btn_editar'])){
 
     <?php }else{ ?>
 
-        <?php $cat_conf = json_decode($list_conf[0]['category_campaign']);?>
+        <?php $cat_conf = json_decode($list_conf[0]['category_campaign']);
+             $date_init = date_create($list_conf[0]['fecha_inicio']);
+             $date_fin = date_create($list_conf[0]['fecha_final']);
+        ?>
+    <div class="tab-content">
+		<div id="tab-4" class="tab-pane active">
+			
         <table class="wp-list-table widefat fixed striped pages">
                 <thead>
                     <th>Nombre de Campaña</th>
@@ -227,15 +234,15 @@ if(empty($list_conf) or isset($_POST['btn_editar'])){
                                 <span class="edit">
                                 <form id="ap_form" action="" method="post">
                                         <input type="hidden" name="IdCampaign" value="<?php echo $list_conf[0]['IdCampaign'];?>">
-                                         <button type="submit" class="page-title-action submitdelete_ap" name="btn_editar" id="btnrestar">Editar </button> | 
-                                         <button type="submit" class="page-title-action submitdelete_ap" name="btn_borrar" id="btnrestar">Borrar</button>
+                                         <button type="submit" class="submitdelete_ap edit_ap" name="btn_editar" id="btnrestar">Editar </button> | 
+                                         <button type="submit" class="submitdelete_ap" name="btn_borrar" id="btnrestar">Borrar</button>
                                     </form>
                                      </span>
                                     </span><span class="view"></span></div>
                         </td>
                             <td class="date column-date" data-colname="Fecha">
-                                <strong>Inicia  </strong>  <?php echo $list_conf[0]['fecha_inicio'];?> <br>
-                                <strong>Finaliza </strong>  <?php echo $list_conf[0]['fecha_final'];?>
+                                <strong>Inicia  </strong>  <?php echo  date_format($date_init, 'd/m/Y' );?> <br>
+                                <strong>Finaliza </strong>  <?php echo date_format($date_fin, 'd/m/Y' );?>
                             </td>
                             <td class="categories column-categories" data-colname="Categorías">
                                <?php  foreach($cat_conf as $cat): ?>
@@ -244,25 +251,49 @@ if(empty($list_conf) or isset($_POST['btn_editar'])){
                             </td>
                             <td class="date column-date" data-colname="Fecha"><strong><?php echo $list_conf[0]['points'];?></strong>  Puntos x <strong><?php echo $list_conf[0]['euros'];?></strong> Euro</td>
                             <td>
-                                <form name="status_form" id="form_status"  method="post">
-                                <input type="hidden" name="IdConfig" value="<?php echo $list_conf[0]['IdCampaign']; ?>">
+                                <form id="form_status"  method="POST">
+                                <input id="checkbox_id" type="hidden" value="<?php echo $list_conf[0]['IdCampaign']; ?>" name="IdCampaign">
                                 <input id="status_check"  type='checkbox' class="wppd-ui-toggle" name="status_check" value='1' <?php  if ( $list_conf[0]['status'] ) echo 'checked="checked"'; ?> /></td>
-                                <!-- <button type='submit' name="status_enviar">enviar</button> -->
+                             
                             </form>
                         </tr>
                        
                 </tbody>
             </table>
+            </div>
+	</div>
+
 <?php }?>
+
 </div>
 
 
 
 
 <script>    
-// var checkbox = document.getElementById('status_check');
-// var form =  document.getElementById('form_status');
-// checkbox.addEventListener( 'change', function() {
-//     form.submit();
-// });
+jQuery(function($){
+    var url_path = '<?php echo admin_url("admin-ajax.php");?>'
+    var data = 0;
+    var checkbox = $("#status_check");
+    var id = $("#checkbox_id");
+        $(":checkbox#status_check").change(function(){
+            
+            if(checkbox.prop('checked')){
+                var value_checkbox = 1;
+            }else{
+                var value_checkbox = 0;
+            }
+                var data = {
+                    'action' : 'ap_update_status',
+                    'IdCampaign': id.val(),
+                    'status_check':  value_checkbox         
+                    };
+            jQuery.post(url_path, data, function(response) {
+                console.log(response);
+            });
+   		});
+
+
+
+});
 </script>

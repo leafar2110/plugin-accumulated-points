@@ -54,35 +54,35 @@ $list_user = $wpdb->get_results($query,ARRAY_A);
         <div id="tab-1" class="tab-pane active">
         <table class="wp-list-table widefat fixed striped pages">
                 <thead>
-                    <th>Nombre de uduario</th>
+                    <th>Nombre de usuario</th>
                     <th>Puntos acumulados</th>
-                    <th>Accion</th>
+                    <th></th>
                     
                 </thead>
                 <tbody id="the-list">
                         <?php foreach ($list_user as $key => $value):?>
-                           <?php $id_user = $value['ID'] ?>
+                            <?php $id_user = $value['ID'] ?>
                             <?php 
                             $query = "SELECT $tabla.point_history FROM $tabla WHERE ID = $id_user ORDER BY $tabla.registered_history DESC LIMIT 1" ;
                             $list_history = $wpdb->get_results($query,ARRAY_A);
                             ?>
                             
-<?php if($list_history):?>
                         <tr>
                             <td><strong class="name_user_ap"><?php echo $value['display_name']; ?></strong><br>
                             <a href="mailto:<?php echo $value['user_email']; ?>" class="btn_email_ap"><?php echo $value['user_email']; ?></a>
 
                            
                         </td>
-                            <td><?php echo $list_history[0]['point_history']; ?> <button class="btn_history" id="edit_puntos">Editar Puntos</button>  
-                                <div id="form_edit_puntos" style="display: none;">
-                                    <form id="ap_form" action="" method="post">
-                                        <input type="hidden" name="id" value="<?php echo $value['ID']; ?>">
-                                        <input type="hidden" name="point_history" value="<?php echo $list_history[0]['point_history']; ?>">
-                                         <input type="number" name="points" value="">
-                                         <button type="submit" class="btn-primary_ap" name="btn_sumar" id="btnsumar">Sumar</button>
-                                         <button type="submit" class="btn-primary_ap" name="btn_restar" id="btnrestar">Restar</button>
-                                    </form>
+                            <td><?php echo $list_history[0]['point_history']; ?> 
+                            <button class="btn_history btn_edit_points" id="edit_puntos">Editar Puntos</button>  
+                            <div class="form_edit_puntos" style="display: none;">
+                                <form id="ap_form" action="" method="post">
+                                    <input type="hidden" name="id" value="<?php echo $value['ID']; ?>">
+                                    <input type="hidden" name="point_history" value="<?php echo $list_history[0]['point_history']; ?>">
+                                        <input type="number" name="points" value="">
+                                        <button type="submit" class="btn-primary_ap" name="btn_sumar" id="btnsumar">Sumar</button>
+                                        <button type="submit" class="btn-primary_ap" name="btn_restar" id="btnrestar">Restar</button>
+                                </form>
                                     
                                 </div>
                             </td>
@@ -101,7 +101,7 @@ $list_user = $wpdb->get_results($query,ARRAY_A);
                                         <input type="hidden" name="id" value="<?php echo $value['ID']; ?>">
                                         <input type="hidden" name="point_history" value="<?php echo $list_history[0]['point_history']; ?>">
                                          <input type="hidden" name="points" value="<?php echo $list_history[0]['point_history']; ?>">
-                                         <button type="submit" class="page-title-action submitdelete_ap" name="btn_restar" id="btnrestar">Reiniciar puntos</button>
+                                         <button type="submit" class="submitdelete_ap" name="btn_restar" id="btnrestar">Reiniciar puntos</button>
                                     </form>
                                 </div>
                                 </div>
@@ -110,7 +110,7 @@ $list_user = $wpdb->get_results($query,ARRAY_A);
                             
                             </td>
                         </tr>
-                        <?php endif; endforeach ?>
+                        <?php  endforeach ?>
                 </tbody>
             </table>
 		</div>
@@ -118,10 +118,10 @@ $list_user = $wpdb->get_results($query,ARRAY_A);
 </div>
 
 <script>
-    document.getElementById("edit_puntos").onclick = function() {editPuntos()};
+  jQuery('.btn_edit_points').click(function (){
+      jQuery('.form_edit_puntos').removeClass("show-form_edit_puntos")
+    jQuery(this).siblings('.form_edit_puntos').addClass("show-form_edit_puntos")
+  })
 
 
-function editPuntos() {
-  document.getElementById("form_edit_puntos").classList.toggle("show-form_edit_puntos");
-}
 </script>
