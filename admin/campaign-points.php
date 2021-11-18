@@ -229,7 +229,7 @@ if(empty($list_conf) or isset($_POST['btn_editar'])){
                        
                         <tr>
                             <td><strong>
-                                <a class="row-title" href=""><?php echo $list_conf[0]['title_campaign']; ?></a></strong>
+                                <?php echo $list_conf[0]['title_campaign']; ?></strong>
                             <div class="row-actions">
                                 <span class="edit">
                                 <form id="ap_form" action="" method="post">

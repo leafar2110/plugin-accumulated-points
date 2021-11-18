@@ -13,7 +13,7 @@ add_action( 'woocommerce_thankyou', function($order_id){
     $query_conf = "SELECT * FROM  $tabla_campign";
     $list_conf = $wpdb->get_results($query_conf,ARRAY_A);
     
-    if($list_conf[0]['status']){
+    if(!empty($list_conf) and $list_conf[0]['status']){
       
       $order = new WC_Order($order_id);
       $id = $order->get_user_id();
@@ -102,7 +102,28 @@ add_action( 'woocommerce_thankyou', function($order_id){
   
 
 
-add_action( 'woocommerce_before_checkout_form', 'ap_message_checkout', 11 );
+
+function ap_activate_message(){
+  global $wpdb;
+  $tabla_campign = "{$wpdb->prefix}ap_points_campaign";
+  $query_conf = "SELECT $tabla_campign.`status` FROM  $tabla_campign";
+  $list_conf = $wpdb->get_results($query_conf,ARRAY_A);
+
+  if(!empty($list_conf) and $list_conf[0]['status']){
+    add_action( 'woocommerce_before_checkout_form', 'ap_message_checkout', 11 );
+    add_action( 'woocommerce_before_single_product_summary', 'ap_message_cart', 11 );
+  }
+
+}
+
+add_action('init', 'ap_activate_message');
+  
+
+
+
+
+
+
 function ap_message_checkout() {
     global $wpdb;
     global $product;
@@ -159,7 +180,6 @@ function ap_message_checkout() {
     }
 }
 
-add_action( 'woocommerce_before_single_product_summary', 'ap_message_cart', 11 );
 function ap_message_cart() {
     global $wpdb;
     global $product;

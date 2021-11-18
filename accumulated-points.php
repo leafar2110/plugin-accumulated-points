@@ -23,7 +23,7 @@ include (AP_POINTS_URL.'/inc/components/form-ajax.php');
 include (AP_POINTS_URL.'/inc/components/product-fields.php');
 include (AP_POINTS_URL.'/inc/components/category-fields.php');
 include (AP_POINTS_URL.'/inc/components/calculate-points.php');
-// include (AP_POINTS_URL.'/inc/components/reset-point.php');
+include (AP_POINTS_URL.'/inc/components/reset-point.php');
 
 function ap_activate_plugin() {
   global $wpdb;

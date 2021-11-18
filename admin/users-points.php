@@ -73,7 +73,7 @@ $list_user = $wpdb->get_results($query,ARRAY_A);
 
                            
                         </td>
-                            <td><?php echo $list_history[0]['point_history']; ?> 
+                            <td><?php if(!empty($list_history)){ echo $list_history[0]['point_history'];} ?> 
                             <button class="btn_history btn_edit_points" id="edit_puntos">Editar Puntos</button>  
                             <div class="form_edit_puntos" style="display: none;">
                                 <form id="ap_form" action="" method="post">

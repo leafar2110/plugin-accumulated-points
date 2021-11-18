@@ -31,13 +31,13 @@ function ap_scripts() {
 		'1.0.0',
 		true
 	);
-	// wp_localize_script(
-	// 	'main-js',
-	// 	'global',
-	// 	array(
-	// 		'ajax' => admin_url( 'admin-ajax.php' ),
-	// 	)
-	// );
+	wp_localize_script(
+		'main-js',
+		'global',
+		array(
+			'ajax' => admin_url( 'admin-ajax.php' ),
+		)
+	);
 
 	
 	

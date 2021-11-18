@@ -1,20 +1,3 @@
-console.log('funciona');
-/* globals global */
-// jQuery(function($){
-// 	var searchRequest;
-// 	$('.search-autocomplete').autoComplete({
-// 		minChars: 2,
-// 		source: function(term, suggest){
-// 			try { searchRequest.abort(); } catch(e){}
-// 			searchRequest = $.post(global.ajax, { search: term, action: 'search_site' }, function(res) {
-// 				suggest(res.data);
-// 			});
-// 		}
-// 	});
-// });
-
-
-
 jQuery(function($){
 
 
@@ -23,7 +6,7 @@ jQuery(function($){
 	// multiple select with AJAX search
 	$('#rudr_select2_posts').select2({
   		ajax: {
-    			url: 'http://localhost/euskofriz/wp-admin/admin-ajax.php', // AJAX URL is predefined in WordPress admin
+    			url: global.ajax, // AJAX URL is predefined in WordPress admin
     			dataType: 'json',
     			delay: 250, // delay in ms while typing when to perform a AJAX search
     			data: function (data) {
